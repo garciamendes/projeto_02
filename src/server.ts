@@ -1,18 +1,17 @@
 // Third party
 import fastify from 'fastify'
+import cookie from '@fastify/cookie'
 
 // Local
 import { env } from './env'
-import { knex } from './database'
+import { transactionsRoutes } from './routes/transactions'
 
 const server = fastify()
 
-server.get('/', async () => {
-  const transactions = await knex('transactions')
-    .where('amount', 1000)
-    .select('*')
-
-  return transactions
+// Executa na ordem
+server.register(cookie)
+server.register(transactionsRoutes, {
+  prefix: 'transactions',
 })
 
 server.listen({ port: env.PORT }).then(() => {
