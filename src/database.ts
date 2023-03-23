@@ -8,7 +8,8 @@ import { env } from './env'
 export const config: Knex.Config = {
   client: 'sqlite',
   connection: {
-    filename: env.DATABASE_URL,
+    filename:
+      env.NODE_ENV === 'test' ? env.DATABASE_URL_TEST : env.DATABASE_URL,
   },
   useNullAsDefault: true,
   migrations: {

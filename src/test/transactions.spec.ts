@@ -1,6 +1,7 @@
 // Third party
-import { expect, beforeAll, afterAll, describe, it } from 'vitest'
+import { expect, beforeAll, afterAll, describe, it, beforeEach } from 'vitest'
 import request from 'supertest'
+import { execSync } from 'node:child_process'
 
 // Projects
 import { server } from '../app'
@@ -13,6 +14,11 @@ describe('Transactions routes', () => {
   afterAll(async () => {
     await server.close()
   }) // DEPOIS de executar todos os meus testes, eu quero fechar a aplicação removendo da mémoria
+
+  beforeEach(() => {
+    execSync('npm run knex migrate:rollback --all')
+    execSync('npm run knex migrate:latest')
+  }) // ANTES de CADA teste iniciar
 
   // Teste pelo server
   it('Testando a criação de uma nova transição', async () => {
@@ -54,5 +60,29 @@ describe('Transactions routes', () => {
         amount: 5000,
       }),
     ])
+  })
+
+  it('Pegando uma transação específica', async () => {
+    const responseCreateTransaction = await request(server.server)
+      .post('/transactions')
+      .send({
+        title: 'New transaction',
+        amount: 5000,
+        type: 'credit',
+      })
+    const cookies = responseCreateTransaction.get('Set-Cookie')
+
+    const responseListTrasactions = await request(server.server)
+      .get('/transactions')
+      .set('Cookie', cookies)
+
+    const transactionId = responseListTrasactions.body.results[0].id
+    const responseGetTransaction = await request(server.server)
+      .get(`/transactions/${transactionId}`)
+      .set('Cookie', cookies)
+
+    expect(responseGetTransaction.body).toEqual(
+      expect.objectContaining(responseListTrasactions.body.results[0]),
+    )
   })
 })
