@@ -13,6 +13,12 @@ const envSchema = z.object({
   DATABASE_URL: z.string(),
   DATABASE_URL_TEST: z.string().optional(),
   PORT: z.coerce.number().default(3333),
+  ALLOWED_ORIGINS: z
+    .string()
+    .regex(
+      /^(http:\/\/|https:\/\/)(www\.)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+    )
+    .default('*'),
 })
 
 const _env = envSchema.safeParse(process.env)
