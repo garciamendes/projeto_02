@@ -1,7 +1,7 @@
 // Third party
 import { expect, beforeAll, afterAll, describe, it, beforeEach } from 'vitest'
 import request from 'supertest'
-import { execSync } from 'node:child_process'
+import { execSync } from 'child_process'
 
 // Projects
 import { server } from '../app'

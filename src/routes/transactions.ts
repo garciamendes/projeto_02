@@ -1,5 +1,5 @@
 // Third party
-import { randomUUID } from 'node:crypto'
+import { randomUUID } from 'crypto'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 
