@@ -85,4 +85,30 @@ describe('Transactions routes', () => {
       expect.objectContaining(responseListTrasactions.body.results[0]),
     )
   })
+
+  it.only('Listando todos os resumos', async () => {
+    const responseCreateTransaction = await request(server.server)
+      .post('/transactions')
+      .send({
+        title: 'Credit transaction',
+        amount: 5000,
+        type: 'credit',
+      })
+    const cookies = responseCreateTransaction.get('Set-Cookie')
+
+    await request(server.server).post('/transactions').send({
+      title: 'Debit transaction',
+      amount: 2000,
+      type: 'debit',
+    })
+
+    const responseSummaryListTrasactions = await request(server.server)
+      .get('/transactions/summary')
+      .set('Cookie', cookies)
+      .expect(200)
+
+    expect(responseSummaryListTrasactions.body.summary).toEqual({
+      amount: 5000,
+    })
+  })
 })

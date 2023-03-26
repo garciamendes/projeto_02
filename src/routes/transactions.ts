@@ -60,7 +60,22 @@ export async function transactionsRoutes(server: FastifyInstance) {
         .sum('amount', { as: 'amount' })
         .first()
 
-      return reply.status(200).send(summary)
+      return reply.status(200).send({ summary })
+    },
+  )
+
+  server.delete(
+    '/:id',
+    { preHandler: [checkSessionIdExists] },
+    async (request, reply) => {
+      const getRequestParams = z.object({
+        id: z.string().uuid(),
+      })
+
+      const { id } = getRequestParams.parse(request.params)
+      await knex('transactions').where('id', id).delete()
+
+      return reply.status(204).send()
     },
   )
 
